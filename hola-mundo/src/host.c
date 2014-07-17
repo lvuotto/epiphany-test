@@ -41,6 +41,17 @@ int main () {
   e_reset_group(&edev);
   e_load_group("epiphany.srec", &edev, 0, 0, E_ROWS, E_COLS, E_TRUE);
   
+  srand(time(NULL));
+  
+  for (row = 0; row < E_ROWS; row++) {
+    for (col = 0; col < E_COLS; col++) {
+      core = row*E_COLS + col;
+      msg.shared_msg[core].seed = rand();
+      printf("A (%d,%d) le toco %d\n", row, col);
+    }
+  }
+  printf("\n---\n\n");
+  
   nano_wait(0, 100000000);  /* Necesario para sincronizar? */
   
   while (E_TRUE) {
@@ -69,13 +80,15 @@ int main () {
   for (row = 0; row < E_ROWS; row++) {
     for (col = 0; col < E_COLS; col++) {
       printf("Hola, soy %u (%d, %d)! Tengo el mensaje %u, "
-             "recibi el mensaje %u, y tarde %u ticks en procesar todo.\n",
+             "recibi el mensaje %u, y tarde %u ticks en procesar todo. "
+             "seed ahora vale %d.\n",
              msg.shared_msg[core].coreid,
              msg.shared_msg[core].coreid >> 6,
              msg.shared_msg[core].coreid & 0x3f,
              msg.shared_msg[core].msg,
              msg.shared_msg[core].external,
-             msg.shared_msg[core].timer);
+             msg.shared_msg[core].timer,
+             msg.shared_msg[core].seed);
     }
   }
   

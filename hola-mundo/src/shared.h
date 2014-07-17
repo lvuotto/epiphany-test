@@ -21,11 +21,12 @@ struct msg_info_s {
   uint32_t msg;
   uint32_t external;
   uint32_t timer;
-} __attribute__((packed, aligned(8)));
+  uint32_t seed;
+} __attribute__((packed, aligned(4)));
 
 struct msg_block_s {
   msg_info_t shared_msg[E_CORES];
-} __attribute__((packed, aligned(8)));
+} __attribute__((packed, aligned(4)));
 
 
 #endif  /* __SHARED_H__ */

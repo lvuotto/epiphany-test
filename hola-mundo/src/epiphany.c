@@ -1,7 +1,6 @@
 
 #include "e-lib.h"
 #include "shared.h"
-#include <stdlib.h>
 
 
 #define BUF_ADDRESS           0x8f000000
@@ -23,7 +22,8 @@ int main () {
   
   core = row*E_COLS + col;
   
-  srand(core);
+  srand(msg->shared_msg[core].seed);
+  msg->shared_msg[core].seed++;
   
   do {
     trow = rand() % E_CORES;
