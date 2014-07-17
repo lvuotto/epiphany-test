@@ -14,7 +14,7 @@ EFLAGS = -funroll-loops -ffast-math
 EOFLAGS = --srec-forceS3 --output-target srec
 
 all: $(EXES)
-
+	mv $(EXES) ../bin/
 
 main: host.c shared.h
 	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -le-hal -lrt -o $@ $^
@@ -27,5 +27,5 @@ epiphany.srec: epiphany.elf
 
 
 clean:
-	rm $(EXES) $(OBJS)
+	rm ../bin/$(EXES) $(OBJS)
 
