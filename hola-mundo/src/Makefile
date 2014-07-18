@@ -9,12 +9,11 @@ OBJS = epiphany.elf
 CC = gcc
 ECC = e-gcc
 EOC = e-objcopy
-CFLAGS = -Wall -Wextra -pedantic -Werror
+CFLAGS = -Wall -Wextra -Werror -Wl,-rpath,$(ELIBS)
 EFLAGS = -funroll-loops -ffast-math
 EOFLAGS = --srec-forceS3 --output-target srec
 
 all: $(EXES)
-	mv $(EXES) ../bin/
 
 main: host.c shared.h
 	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -o $@ $^ -le-hal -lrt
@@ -27,5 +26,5 @@ epiphany.srec: epiphany.elf
 
 
 clean:
-	rm ../bin/$(EXES) $(OBJS)
+	rm -f $(EXES) $(OBJS)
 
