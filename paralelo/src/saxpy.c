@@ -3,27 +3,24 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <omp.h>
 #include "tiempo.h"
 
 
-#define SIZE 1000000
+#define SIZE 100000
+
+
+#include "arreglos.h"
 
 
 int main () {
   
-  unsigned long long int a[SIZE], i;
+  unsigned long long int i;
+  double a[SIZE];
   
-  srand(0);
-  
-  /*#pragma omp parallel for*/
-  /*for (i = 0; i < SIZE; i++) {
-    b[i] = rand() % 1024;
-    c[i] = rand() % 1024;
-  }*/
-  
-  #pragma omp parallel for num_threads(40)
+  #pragma omp parallel for
   for (i = 0; i < SIZE; i++) {
-    a[i] = i*i;
+    a[i] = sqrt(b[i]*c[i]);
   }
   
   printf("%p\n", (void *) &a);

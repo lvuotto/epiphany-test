@@ -17,10 +17,10 @@ all: $(EXES)
 	mv $(EXES) ../bin/
 
 main: host.c shared.h
-	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -le-hal -lrt -o $@ $^
+	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -o $@ $^ -le-hal -lrt
 
 epiphany.elf: epiphany.c shared.h
-	$(ECC) $(CFLAGS) $(EFLAGS) -O3 -T $(ELDF) -le-lib -o $@ $^
+	$(ECC) $(CFLAGS) $(EFLAGS) -O3 -T $(ELDF) -o $@ $^ -le-lib
 
 epiphany.srec: epiphany.elf
 	$(EOC) $(EOFLAGS) $^ $@
