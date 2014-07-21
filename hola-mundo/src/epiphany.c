@@ -6,6 +6,7 @@
 
 #define BUF_ADDRESS           0x8f000000
 #define EPIPHANY_BASE_ADDRESS        0x0
+#define E_GROUP_CORES (e_group_config.group_rows * e_group_config.group_cols)
 
 
 int main () {
@@ -23,20 +24,22 @@ int main () {
   coreid = e_get_coreid();
   e_coords_from_coreid(coreid, &row, &col);
    
-  core = row*E_COLS + col;
+  core = row*e_group_config.group_cols + col;
   
   srand(msg->shared_msg[core].seed);
   msg->shared_msg[core].seed = msg->shared_msg[core].seed + 10;
   
-  do {
-    trow = rand() % E_ROWS;
-    tcol = rand() % E_COLS;
-  } while (trow == row && tcol == col);
+  trow = ((core + 1) % E_GROUP_CORES) / e_group_config.group_rows;
+  tcol =  (core + 1) % e_group_config.group_cols;
   
-  ec = e_get_global_addres(trow, tcol, ec);
-  *ec = coreid;
-  msg->shared_msg[core].msg = 2000 + rand() % 1000;
+  ec = e_get_global_address(trow, tcol, ec);
+  e_write(&e_group_config, &coreid, 0, 0, ec, sizeof(e_coreid_t));
+  /**ec = coreid;*/
+  msg->shared_msg[core].msg = e_coreid_from_coords(trow, tcol);
   msg->shared_msg[core].external = *(unsigned int *) 0x4000;
+    
+  /* Sync */
+  e_wait(E_CTIMER_1, 2000); 
   msg->shared_msg[core].timer = 0xffffffff - e_ctimer_get(E_CTIMER_0);
   msg->shared_msg[core].coreid = coreid;
 

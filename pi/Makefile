@@ -3,8 +3,8 @@ ESDK = $(EPIPHANY_HOME)
 ELIBS = $(ESDK)/tools/host/lib
 EINCS = $(ESDK)/tools/host/include
 ELDF = $(ESDK)/bsps/current/internal.ldf
-EXES = main epiphany.srec
-OBJS = epiphany.elf
+EXES = main e_pi.srec
+OBJS = e_pi.elf
 
 CC = gcc
 ECC = e-gcc
@@ -15,13 +15,13 @@ EOFLAGS = --srec-forceS3 --output-target srec
 
 all: $(EXES)
 
-main: host.c shared.h
-	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -DSEED=176 -o $@ $^ -le-hal -lrt
+main: pi.c shared.h
+	$(CC) $(CFLAGS) -I$(EINCS) -L$(ELIBS) -o $@ $^ -le-hal -lrt
 
-epiphany.elf: epiphany.c shared.h
+e_pi.elf: e_pi.c shared.h
 	$(ECC) $(CFLAGS) $(EFLAGS) -O3 -T $(ELDF) -o $@ $^ -le-lib
 
-epiphany.srec: epiphany.elf
+e_pi.srec: e_pi.elf
 	$(EOC) $(EOFLAGS) $^ $@
 
 
