@@ -23,43 +23,43 @@ static inline void nano_wait (uint32_t s, uint32_t ns) {
 int main () {
   
   unsigned int row, col, core;
-  e_platform_t eplat;
-  e_epiphany_t edev;
-  e_mem_t emem;
+  e_platform_t platform;
+  e_epiphany_t devide;
+  e_mem_t mem;
   static msg_block_t msg;
   
   memset(&msg, 0, sizeof(msg));
   
+  e_init(NULL);
+  e_reset_system();
+  e_get_platform_info(&platform);
+  e_alloc(&mem, BUF_OFFSET, sizeof(msg_block_t));
+  /* Cómo sé que ^ pone el buffer en 0x8f00000000? */
+  /* Esta definido en el hdf por default.          */
+  
   srand(0);
-  for (row = 0; row < E_ROWS; row++) {
-    for (col = 0; col < E_COLS; col++) {
-      core = row*E_COLS + col;
+  for (row = 0; row < platform.rows; row++) {
+    for (col = 0; col < platform.cols; col++) {
+      core = row*platform.cols + col;
       msg.shared_msg[core].seed = core;
       printf("A (%d,%d) le toco %d\n", row, col, msg.shared_msg[core].seed);
     }
   }
   printf("\n---\n\n");
   
-  e_init(NULL);
-  e_reset_system();
-  e_get_platform_info(&eplat);
-  e_alloc(&emem, BUF_OFFSET, sizeof(msg_block_t));
-  /* Cómo sé que ^ pone el buffer en 0x8f00000000? */
-  /* Esta definido en el hdf por default.          */
-  
-  e_open(&edev, 0, 0, E_ROWS, E_COLS);
-  e_write(&emem, 0, 0, 0, &msg, sizeof(msg));
-  e_reset_group(&edev);
-  e_load_group("epiphany.srec", &edev, 0, 0, E_ROWS, E_COLS, E_TRUE);
+  e_open(&devide, 0, 0, platform.rows, platform.cols);
+  e_write(&mem, 0, 0, 0, &msg, sizeof(msg));
+  e_reset_group(&devide);
+  e_load_group("epiphany.srec", &devide, 0, 0, platform.rows, platform.cols, E_TRUE);
   
   nano_wait(0, 10000000);  /* Necesario para sincronizar? */
   
   while (E_TRUE) {
-    for (row = 0; row < E_ROWS; row++) {
-      for (col = 0; col < E_COLS; col++) {
-        core = row*E_COLS + col;
+    for (row = 0; row < platform.rows; row++) {
+      for (col = 0; col < platform.cols; col++) {
+        core = row*platform.cols + col;
         while (E_TRUE) {  /* espero hasta que cambie algo */
-          e_read(&emem,
+          e_read(&mem,
                  0,
                  0,
                  (off_t) ((char *)&msg.shared_msg[core] - (char *)&msg),
@@ -80,9 +80,9 @@ int main () {
     break;
   }
   
-  for (row = 0; row < E_ROWS; row++) {
-    for (col = 0; col < E_COLS; col++) {
-      core = row*E_COLS + col;
+  for (row = 0; row < platform.rows; row++) {
+    for (col = 0; col < platform.cols; col++) {
+      core = row*platform.cols + col;
       printf("Hola, soy %u (%d, %-2d)! Tengo el mensaje %u, "
              "recibi el mensaje %u, y tarde %u ticks en procesar todo. "
              "seed ahora vale %d.\n",
@@ -96,8 +96,8 @@ int main () {
     }
   }
   
-  e_close(&edev);
-  e_free(&emem);
+  e_close(&devide);
+  e_free(&mem);
   e_finalize();
   
   return 0;
